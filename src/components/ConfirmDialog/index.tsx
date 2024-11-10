@@ -1,12 +1,14 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { Dialog, Input, makeStyles } from '@rneui/themed';
+import { Button, Dialog, Input, makeStyles } from '@rneui/themed';
 import { FunctionComponent, memo } from 'react';
+import GroupOption from './GroupOption';
 
 interface ConfirmDialogProps {
     title: string;
     visible: boolean;
     toggleDialog: (isConfirm?: boolean) => void;
     inputProps?: { label?: string, placeholder?: string, inputValue?: string, setInputValue?: (value: string) => void };
+    groupOptionProps?: { title: string, selectedGroup: number, setSelectedGroup: (value: number) => void };
 }
 
 const useStyles = makeStyles(theme => ({
@@ -31,7 +33,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({ title, visible, toggleDialog, inputProps }) => {
+const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({ title, visible, toggleDialog, inputProps, groupOptionProps }) => {
     const styles = useStyles();
     return (
         <Dialog
@@ -41,16 +43,18 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({ title, visible, 
         >
             <Dialog.Title title={title}/>
             { inputProps && <Input style={styles.input} label={inputProps?.label} placeholder={inputProps?.placeholder} value={inputProps?.inputValue} onChangeText={inputProps?.setInputValue}/> }
+            { groupOptionProps && <GroupOption title={groupOptionProps.title} selectedGroup={groupOptionProps.selectedGroup} setSelectedGroup={groupOptionProps.setSelectedGroup} /> }
             <Dialog.Actions>
-                <Dialog.Button
+                <Button
                     title="取消"
+                    type="clear"
                     titleStyle={styles.title}
                     containerStyle={styles.buttonContainer}
                     onPress={() => {
                         toggleDialog(false);
                     }}
                 />
-                <Dialog.Button title="确认" titleStyle={styles.title} containerStyle={styles.buttonContainer} onPress={() => toggleDialog(true)} />
+                <Button type="clear" title="确认" titleStyle={styles.title} containerStyle={styles.buttonContainer} onPress={() => toggleDialog(true)} />
             </Dialog.Actions>
         </Dialog>
         );

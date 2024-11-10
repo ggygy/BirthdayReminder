@@ -115,7 +115,9 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
         if (isConfirm) {
             deleteBirthDayCardGroupsData(friendInfo.group, [friendInfo]);
         }
-        setIsConfirmDialogVisible(false);
+        setTimeout(() => {
+            setIsConfirmDialogVisible(false);
+        }, 1000);
     };
 
     const handleDelete = async () => {

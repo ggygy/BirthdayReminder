@@ -10,6 +10,7 @@ import ReminderScreen from '@screens/Reminder';
 import TabBar from '@components/TabBar';
 import {theme} from '@utils/theme';
 import {ThemeProvider} from '@rneui/themed';
+import { enableNotification } from '@utils/notification';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,6 +28,13 @@ function App(): React.JSX.Element {
       isMountedRef.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (isMountedRef.current) {
+      enableNotification();
+    }
+  }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <NavigationContainer>

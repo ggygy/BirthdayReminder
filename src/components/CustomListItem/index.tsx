@@ -1,8 +1,8 @@
 /* eslint-disable react/react-in-jsx-scope */
 /* eslint-disable react-native/no-inline-styles */
-import { Icon, ListItem, makeStyles, Switch } from '@rneui/themed';
+import { Icon, ListItem, makeStyles } from '@rneui/themed';
 import { FunctionComponent, memo, useState } from 'react';
-import { type StyleProp } from 'react-native';
+import { Switch, type StyleProp } from 'react-native';
 
 export interface CustomListItemProps {
     iconName: string;

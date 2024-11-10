@@ -1,11 +1,11 @@
 import {makeStyles} from '@rneui/themed';
 import React, {FunctionComponent} from 'react';
 import {Text, View} from 'react-native';
-import {SettingHeader} from '@components/Header';
+import { ReminderHeader } from '@components/Header/ReminderHeader';
 
 interface ReminderScreenProps {}
 
-const useStyles = makeStyles((theme, props?: Partial<ReminderScreenProps>) => ({
+const useStyles = makeStyles((theme) => ({
   container: {
     flex: 1,
     flexDirection: 'column',
@@ -18,7 +18,7 @@ const ReminderScreen: FunctionComponent<ReminderScreenProps> = () => {
 
   return (
     <View style={styles.container}>
-      <SettingHeader />
+      <ReminderHeader />
       <Text>Settings!</Text>
     </View>
   );

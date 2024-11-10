@@ -1,13 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import { Button, Icon, ListItem, makeStyles } from '@rneui/themed';
+import { Button, makeStyles } from '@rneui/themed';
 import React, { FunctionComponent, memo, useContext, useState } from 'react';
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import PressableWrapperText from '../../pressableText';
-import { HomePageConText } from '@context/homePageContext';
+import { FriendInfo, HomePageConText } from '@context/homePageContext';
 import ConfirmDialog from '@components/ConfirmDialog';
 import CustomListItem from '@components/CustomListItem';
+import { keyExists, storeData } from '@utils/storage';
 
 interface HomeHeaderProps {
 
@@ -87,31 +88,51 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     height: 60,
     marginVertical: 10,
-  }
+  },
 }));
 
-const Tools = memo(() => {
+const Tools = memo(({ setActive }: {
+  setActive: (index: number) => void;
+}) => {
   const styles = useStyles();
-  const [openLayer, setOpenLayer] = React.useState(false);
+  const [openLayer, setOpenLayer] = useState(false);
   const [options, setOptions] = useState('');
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [groupInput, setGroupInput] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState(0);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const { groupList, updateGroupList, deleteGroupList, setGroup } = useContext(HomePageConText);
 
   const handleDeleteGroup = () => {
-    console.log('删除分组');
     setOptions('删除');
     setIsDialogVisible(true);
   };
 
   const handleAddGroup = () => {
-    console.log('添加分组');
     setOptions('添加');
     setIsDialogVisible(true);
   };
 
   const toggleConfirmDialog = (isConfirm?: boolean) => {
+    if (!isConfirm) {
+      setIsDialogVisible(false);
+      return;
+    }
+    if (options === '添加') {
+      // 添加分组
+      updateGroupList(groupInput);
+      setGroup(groupInput);
+      setActive(groupList.length);
+    } else if (options === '删除') {
+      // 删除分组
+      deleteGroupList(groupList[selectedGroup]);
+      setGroup(groupList[0]);
+      setActive(0);
+    }
     setIsDialogVisible(false);
-    setOpenLayer(false);
+    setGroupInput('');
+    setTimeout(() => {
+      setOpenLayer(false);
+    }, 500);
   };
 
   return (
@@ -129,11 +150,19 @@ const Tools = memo(() => {
           <CustomListItem iconName={'trash-can-outline'} iconType={'material-community'} title={'删除分组'} onPress={() => handleDeleteGroup()} />
         </View>
       }
-      <ConfirmDialog title={`是否${options}分组`} inputProps={{
+      <ConfirmDialog title={`是否${options}分组`}
+        inputProps={options === '添加' ? {
           placeholder: '请输入分组名称',
           inputValue: groupInput,
           setInputValue: setGroupInput,
-        }} visible={isDialogVisible} toggleDialog={toggleConfirmDialog} />
+        } : undefined}
+        groupOptionProps={options === '删除' ? {
+            title: '选择分组',
+            selectedGroup,
+            setSelectedGroup,
+          } : undefined
+        }
+       visible={isDialogVisible} toggleDialog={toggleConfirmDialog} />
     </View>
   );
 });
@@ -141,29 +170,78 @@ const Tools = memo(() => {
 const BatchManageTools = memo(() => {
   const styles = useStyles();
   const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const { group, selectedItems, handleBatchManage, deleteBirthDayCardGroupsData } = useContext(HomePageConText);
+  const [options, setOptions] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState(0);
+  const { group, groupList,selectedItems, handleBatchManage, deleteBirthDayCardGroupsData } = useContext(HomePageConText);
 
   const handleCancel = () => {
     handleBatchManage(false);
   };
 
   const handleDelete = () => {
+    setOptions('删除');
     setIsDialogVisible(true);
   };
 
-  const toggleConfirmDialog = (isConfirm?: boolean) => {
-    if (isConfirm) {
-      deleteBirthDayCardGroupsData(group, undefined);
+  const handleMove = () => {
+    setOptions('移动');
+    setIsDialogVisible(true);
+  };
+
+  const toggleConfirmDialog = async (isConfirm?: boolean) => {
+    if (!isConfirm) {
+      setIsDialogVisible(false);
+      return;
     }
+    const selectedKeys = Object.keys(selectedItems).filter(key => selectedItems[key]);
+    const groupKey = groupList[selectedGroup];
+
+    if (selectedKeys.length === 0) {
+      Alert.alert('提示', `请选择要${options}的项目`);
+      return;
+    }
+    const data = await keyExists(`birthDayData-${group}`);
+    const toBeDeletedData = selectedKeys.map(key => {
+      if (!data) {
+        return;
+      }
+      const birthDayData: FriendInfo[] = JSON.parse(data);
+      return birthDayData.find((item: FriendInfo) => item.name + item.birthDay === key);
+    });
+    await deleteBirthDayCardGroupsData(group, toBeDeletedData.filter(item => item !== undefined));
+    if (options === '移动' && groupKey !== group) {
+      const anotherGroupData = await keyExists(`birthDayData-${groupKey}`);
+      const newData = toBeDeletedData.filter(item => item !== undefined);
+      if (anotherGroupData) {
+        const birthDayData: FriendInfo[] = JSON.parse(anotherGroupData);
+        newData.forEach(item => {
+          birthDayData.push(item);
+        });
+        await storeData(`birthDayData-${groupKey}`, birthDayData);
+      } else {
+        await storeData(`birthDayData-${groupKey}`, newData);
+      }
+    }
+    handleBatchManage(false);
     setIsDialogVisible(false);
   };
 
   return (
     <View style={styles.batchManageTools}>
-      <PressableWrapperText text={'移动'} style={styles.toolsLabel} />
+      <PressableWrapperText text={'移动'} style={styles.toolsLabel} onPress={() => handleMove()} />
       <PressableWrapperText text={'删除'} style={styles.toolsLabel} onPress={() => handleDelete()} />
       <PressableWrapperText text={'取消'} style={styles.toolsLabel} onPress={() => handleCancel()} />
-      <ConfirmDialog title={'是否进行此批量操作'} visible={isDialogVisible} toggleDialog={toggleConfirmDialog} />
+      <ConfirmDialog
+        title={'是否进行此批量操作'}
+        groupOptionProps={
+          options === '移动' ? {
+            title: '选择分组',
+            selectedGroup,
+            setSelectedGroup,
+          } : undefined
+        }
+        visible={isDialogVisible}
+        toggleDialog={toggleConfirmDialog} />
     </View>
   );
 });
@@ -200,7 +278,7 @@ const HomeHeader: FunctionComponent<HomeHeaderProps> = () => {
         }
       </ScrollView>
       {
-        isBatchManage ? <BatchManageTools /> : <Tools />
+        isBatchManage ? <BatchManageTools /> : <Tools setActive={setActive}/>
       }
     </View>
   );

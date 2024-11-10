@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const BirthDayAdditional: FunctionComponent<BirthDayAdditionalProps> = ({ 
+const BirthDayAdditional: FunctionComponent<BirthDayAdditionalProps> = ({
     visible = false,
     isBatch = false,
     isEditMode = false,

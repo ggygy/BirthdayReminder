@@ -1,6 +1,7 @@
 import { groupByBirthDayCardGroupTitle } from '@utils/sortBirthday';
-import { keyExists, storeData } from '@utils/storage';
+import { keyExists, removeKey, storeData } from '@utils/storage';
 import React, { createContext, type ReactNode, useCallback, useEffect, useState } from 'react';
+import { useIsFirstRender } from '../hooks/isFirstRender';
 
 export type FriendInfo = {
   avatar?: string;
@@ -31,6 +32,7 @@ interface HomePageConTextType {
   setGroup: (group: string) => void;
   setBirthDayCardGroupsData: (data: { [key in BirthDayCardGroupTitle]: FriendInfo[] }) => void;
   updateGroupList: (groupList: string) => void;
+  deleteGroupList: (toBeDeletedGroup: string) => void;
   deleteBirthDayCardGroupsData: (groupKey: string, toBeDeletedData: FriendInfo[]) => void;
   editBirthDayCardGroupsData: (groupKey: string, toBeEditedData: FriendInfo, editedBirthDayCardData: FriendInfo) => void;
   updateBirthDayCardGroupsData: (newData: FriendInfo) => void;
@@ -54,6 +56,7 @@ export const HomePageConText = createContext<HomePageConTextType>({
   editBirthDayCardGroupsData: () => { },
   updateBirthDayCardGroupsData: () => { },
   updateGroupList: () => { },
+  deleteGroupList: () => { },
   handleBatchManage: () => { },
   handleCheckBoxChange: () => { },
 });
@@ -64,6 +67,7 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
   const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({});
   const [groupList, setGroupList] = useState<string[]>(['我的好友']);
   const [group, setGroup] = useState<string>('我的好友');
+  const isFirstRender = useIsFirstRender();
   const [birthDayCardGroupsData, setBirthDayCardGroupsData] = useState<{ [key in BirthDayCardGroupTitle]: FriendInfo[] }>({
     [BirthDayCardGroupTitle.today]: [],
     [BirthDayCardGroupTitle.oneMonth]: [],
@@ -105,6 +109,35 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
         const birthDayCardGroupTempData: FriendInfo[] = JSON.parse(data);
         setBirthDayCardGroupsData(groupByBirthDayCardGroupTitle(birthDayCardGroupTempData));
       } else {
+        if (isFirstRender && group === '我的好友') {
+          setBirthDayCardGroupsData(groupByBirthDayCardGroupTitle(
+            [
+              {
+                avatar: undefined,
+                name: '马馨怡',
+                age: 18,
+                gender: '女',
+                isRemind: true,
+                birthDay: '11月12日',
+                birthDayDate: new Date('2003-11-12'),
+                nextBirthDay: 0,
+                group: '我的好友',
+              },
+              {
+                avatar: undefined,
+                name: '周王军',
+                age: 18,
+                gender: '男',
+                isRemind: true,
+                birthDay: '5月13日',
+                birthDayDate: new Date('1999-5-13'),
+                nextBirthDay: 0,
+                group: '我的好友',
+              },
+          ],
+          ));
+          return;
+        }
         setBirthDayCardGroupsData({
           [BirthDayCardGroupTitle.today]: [],
           [BirthDayCardGroupTitle.oneMonth]: [],
@@ -113,17 +146,21 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
       }
     };
     fetchData();
-  }, [group]);
+  }, [group, isFirstRender]);
 
 
   const updateGroupList = useCallback((newGroup: string) => {
     setGroupList(prevState => {
-      console.log('prevState', prevState);
       if (prevState.includes(newGroup)) {
         return prevState;
       }
       return [...prevState, newGroup];
     });
+  }, []);
+
+  const deleteGroupList = useCallback((toBeDeletedGroup: string) => {
+    setGroupList(prevState => prevState.filter((item: string) => item !== toBeDeletedGroup));
+    removeKey(`birthDayData-${toBeDeletedGroup}`);
   }, []);
 
   const deleteBirthDayCardGroupsData = useCallback(async (groupKey: string, toBeDeletedData: FriendInfo[]) => {
@@ -221,6 +258,7 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
         setGroup,
         setBirthDayCardGroupsData,
         updateGroupList,
+        deleteGroupList,
         deleteBirthDayCardGroupsData,
         editBirthDayCardGroupsData,
         updateBirthDayCardGroupsData,

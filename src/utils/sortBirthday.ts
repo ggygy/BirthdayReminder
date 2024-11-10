@@ -34,6 +34,7 @@ export const groupByBirthDayCardGroupTitle = (friendInfoList: FriendInfo[]): { [
   // 更新 nextBirthDay 并根据 nextBirthDay 进行排序
   const sortedList = friendInfoList.map(friend => ({
     ...friend,
+    age: new Date().getFullYear() - new Date(friend.birthDayDate).getFullYear(),
     nextBirthDay: calculateNextBirthDay(friend.birthDayDate),
   })).sort((a, b) => a.nextBirthDay - b.nextBirthDay);
 
