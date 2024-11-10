@@ -2,6 +2,7 @@ import {makeStyles} from '@rneui/themed';
 import React, {FunctionComponent} from 'react';
 import {Text, View} from 'react-native';
 import {SettingHeader} from '@components/Header';
+import Settings from '@components/Settings';
 
 interface SettingsScreenProps {}
 
@@ -19,7 +20,7 @@ const SettingsScreen: FunctionComponent<SettingsScreenProps> = () => {
   return (
     <View style={styles.container}>
       <SettingHeader />
-      <Text>Settings!</Text>
+      <Settings />
     </View>
   );
 };

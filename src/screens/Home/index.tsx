@@ -1,9 +1,10 @@
 import React, {FunctionComponent} from 'react';
 import {View} from 'react-native';
-import {HomeHeader} from '@components/Header';
+import {HomeHeaderMemo} from '@components/Header';
 import {HomePageProvider} from '@context/homePageContext';
 import {makeStyles} from '@rneui/themed';
 import BottomSheet from '@components/BottomSheet';
+import BirthDayCardGroups from '@components/BirthDayCardGroups';
 
 interface HomeScreenProps {}
 
@@ -11,12 +12,13 @@ const useStyles = makeStyles(theme => ({
   container: {
     flex: 1,
     alignItems: 'center',
+    position: 'relative',
     backgroundColor: theme.colors.background,
   },
   bottomSheet: {
     position: 'absolute',
-    bottom: 320,
-    top: 100,
+    bottom: 50,
+    right: 24,
   },
 }));
 
@@ -25,8 +27,9 @@ const HomeScreen: FunctionComponent<HomeScreenProps> = () => {
   return (
     <HomePageProvider>
       <View style={styles.container}>
-        <HomeHeader />
-        <BottomSheet style={styles.bottomSheet}/>
+        <HomeHeaderMemo />
+        <BirthDayCardGroups />
+        <BottomSheet buttonStyle={styles.bottomSheet}/>
       </View>
     </HomePageProvider>
   );

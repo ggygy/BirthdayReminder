@@ -1,19 +1,21 @@
 import { makeStyles, Text } from '@rneui/themed';
-import React, { FunctionComponent } from 'react';
-import { type GestureResponderEvent, Pressable, StyleProp, View } from 'react-native';
+import React, { FunctionComponent, memo } from 'react';
+import { type GestureResponderEvent, Pressable, StyleProp, TouchableOpacity, View } from 'react-native';
 
 interface PressableWrapperTextProps {
-  onPress?: (event: GestureResponderEvent) => void;
-  onLongPress?: (event: GestureResponderEvent) => void;
-  onPressIn?: (event: GestureResponderEvent) => void;
-  onPressOut?: (event: GestureResponderEvent) => void;
+  onPress?: (event?: GestureResponderEvent) => void;
+  onLongPress?: (event?: GestureResponderEvent) => void;
+  onPressIn?: (event?: GestureResponderEvent) => void;
+  onPressOut?: (event?: GestureResponderEvent) => void;
   delayLongPress?: number;
   disabled?: boolean;
   style?: StyleProp<any> | (({ pressed }: { pressed: boolean }) => StyleProp<any>);
+  containerStyle?: StyleProp<any>;
   text?: string;
   underline?: boolean;
   underlineColor?: string;
   underlineColorWidth?: number;
+  activeOpacity?: number;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -37,37 +39,43 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const PressableWrapperText: FunctionComponent<PressableWrapperTextProps> = ({
-  onPress,
-  delayLongPress,
-  onLongPress,
-  onPressIn,
-  onPressOut,
-  disabled,
-  style,
+  onPress = () => { },
+  delayLongPress = 0,
+  onLongPress = () => { },
+  onPressIn = () => { },
+  onPressOut = () => { },
+  disabled = false,
+  style = {},
+  containerStyle = {},
   text = '',
   underline = false,
   underlineColor = 'black',
   underlineColorWidth = 15,
+  activeOpacity = 0.5,
 }) => {
   const styles = useStyles();
   return (
     <Pressable
-      onPress={onPress}
       delayLongPress={delayLongPress}
-      onPressIn={onPressIn}
-      onPressOut={onPressOut}
-      onLongPress={onLongPress}
       disabled={disabled}
       style={[]}>
-      <View style={styles.container}>
-        <Text style={[styles.text, style]}>{text}</Text>
-        {underline && <View style={[styles.underline, {
-          width: underlineColorWidth,
-          backgroundColor: underlineColor
-        }]} />}
-      </View>
+      <TouchableOpacity
+        activeOpacity={activeOpacity}
+        onPress={() => onPress()}
+        onPressIn={() => onPressIn()}
+        onPressOut={() => onPressOut()}
+        onLongPress={() => onLongPress()}
+      >
+        <View style={[styles.container, containerStyle]}>
+          <Text style={[styles.text, style]}>{text}</Text>
+          {underline && <View style={[styles.underline, {
+            width: underlineColorWidth,
+            backgroundColor: underlineColor,
+          }]} />}
+        </View>
+      </TouchableOpacity>
     </Pressable>
   );
 };
 
-export default PressableWrapperText;
+export default memo(PressableWrapperText);

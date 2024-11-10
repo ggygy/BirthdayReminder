@@ -11,7 +11,10 @@ interface TabBarIconProps {
 }
 
 const styles = StyleSheet.create({
-  icon: {paddingTop: 7},
+  icon: {
+    paddingTop: 7,
+    alignSelf: 'center',
+  },
 });
 
 const TabBarIcon: FunctionComponent<TabBarIconProps> = ({

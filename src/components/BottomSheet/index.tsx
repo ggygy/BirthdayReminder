@@ -1,16 +1,23 @@
-import { FunctionComponent, useState } from "react";
+/* eslint-disable react/react-in-jsx-scope */
+import { FunctionComponent, memo, useState } from 'react';
 import { BottomSheet as BottomSheetUI, Button, ListItem, makeStyles } from '@rneui/themed';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { StyleProp, View } from "react-native";
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { StyleProp, TouchableOpacity, View } from 'react-native';
+import BirthDayAdditional from '@components/birthDayAdditional';
 
 interface BottomSheetProps {
-    style?: StyleProp<any> | (({ pressed }: { pressed: boolean }) => StyleProp<any>);
+    buttonStyle?: StyleProp<any> | (({ pressed }: { pressed: boolean }) => StyleProp<any>);
 }
 
 const useStyles = makeStyles(theme => ({
-    button: {
-        height: 50,
-        margin: 10,
+    buttonStyle: {
+        width: 40,
+        height: 40,
+        borderRadius: 40,
+        margin: 0,
+        padding: 0,
+        backgroundColor: '#ff5a5d',
     },
     bottomSheetContainer: {
         borderRadius: 10,
@@ -36,22 +43,38 @@ const useStyles = makeStyles(theme => ({
     cancelTitleStyle: {
         color: theme.colors.error,
         alignSelf: 'center',
-    }
+    },
+    buttonContainerStyle: {
+        alignSelf: 'center',
+    },
 }));
 
-const BottomSheet: FunctionComponent<BottomSheetProps> = ({ style = {} }) => {
+const BottomSheet: FunctionComponent<BottomSheetProps> = ({ buttonStyle = {} }) => {
     const [isVisible, setIsVisible] = useState(false);
+    const [isDialogVisible, setIsDialogVisible] = useState(false);
+    const [isBatch, setIsBatch] = useState(false);
     const styles = useStyles();
+
     const list = [
         {
             title: '单个添加',
             containerStyle: styles.itemContainerStyle,
             titleStyle: styles.itemTitleStyle,
+            onPress: () => {
+                setIsVisible(false);
+                setIsBatch(false);
+                setIsDialogVisible(true);
+            },
         },
         {
             title: '批量添加',
             containerStyle: styles.itemContainerStyle,
             titleStyle: styles.itemTitleStyle,
+            onPress: () => {
+                setIsVisible(false);
+                setIsBatch(true);
+                setIsDialogVisible(true);
+            },
         },
         {
             title: '取消',
@@ -62,37 +85,44 @@ const BottomSheet: FunctionComponent<BottomSheetProps> = ({ style = {} }) => {
     ];
 
     return (
-        <SafeAreaProvider>
+        <>
             <Button
-                title="Open Bottom Sheet"
+                icon={<AntDesign name="plus" size={20} color="white" />}
                 onPress={() => setIsVisible(true)}
-                buttonStyle={[styles.button, style]}
-            />
-            <BottomSheetUI modalProps={{}} isVisible={isVisible}>
-                <View style={styles.bottomSheetContainer}>
-                    {list.slice(0, -1).map((l, i) => (
-                        <ListItem
-                            key={i}
-                            containerStyle={l.containerStyle}
-                            onPress={l.onPress}
-                        >
-                            <ListItem.Content>
-                                <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
-                            </ListItem.Content>
-                        </ListItem>
-                    ))}
-                </View>
-                <ListItem
-                    containerStyle={list[list.length - 1].containerStyle}
-                    onPress={list[list.length - 1].onPress}
-                >
-                    <ListItem.Content>
-                        <ListItem.Title style={list[list.length - 1].titleStyle}>{list[list.length - 1].title}</ListItem.Title>
-                    </ListItem.Content>
-                </ListItem>
-            </BottomSheetUI>
-        </SafeAreaProvider>
+                // eslint-disable-next-line react-native/no-inline-styles
+                titleStyle={{ fontSize: 22, fontWeight: 100 }}
+                buttonStyle={styles.buttonStyle}
+                containerStyle={buttonStyle} />
+            <BirthDayAdditional visible={isDialogVisible} isBatch={isBatch} setIsDialogVisible={setIsDialogVisible}/>
+            <SafeAreaProvider>
+                <BottomSheetUI modalProps={{ presentationStyle: 'fullScreen' }} isVisible={isVisible}>
+                    <View style={styles.bottomSheetContainer}>
+                        {list.slice(0, -1).map((l, i) => (
+                            <ListItem
+                                key={i}
+                                containerStyle={l.containerStyle}
+                                onPress={l.onPress}
+                            >
+                                <TouchableOpacity style={styles.buttonContainerStyle} onPress={l.onPress}>
+                                    <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                                </TouchableOpacity>
+                            </ListItem>
+                        ))}
+                    </View>
+                    <ListItem
+                        containerStyle={list[list.length - 1].containerStyle}
+                        onPress={list[list.length - 1].onPress}
+                    >
+                        <ListItem.Content>
+                            <TouchableOpacity style={styles.buttonContainerStyle} onPress={list[list.length - 1].onPress}>
+                                <ListItem.Title style={list[list.length - 1].titleStyle}>{list[list.length - 1].title}</ListItem.Title>
+                            </TouchableOpacity>
+                        </ListItem.Content>
+                    </ListItem>
+                </BottomSheetUI>
+            </SafeAreaProvider>
+        </>
     );
-}
+};
 
-export default BottomSheet;
+export default memo(BottomSheet);

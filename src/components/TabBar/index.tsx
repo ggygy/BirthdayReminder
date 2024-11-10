@@ -29,6 +29,7 @@ const useStyles = makeStyles(theme => ({
   },
   tabText: {
     fontSize: 14,
+    alignSelf: 'center',
   },
   indicator: {
     height: 3,
@@ -111,7 +112,7 @@ const TabBar: FunctionComponent<TabBarProps> = ({
               <TabBarIcon
                 route={route}
                 focused={isFocused}
-                size={24}
+                size={26}
                 color={isFocused ? '#63B7FB' : '#acb4bf'}
               />
               <Text

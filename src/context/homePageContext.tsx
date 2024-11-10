@@ -1,23 +1,232 @@
-import React, {createContext, type ReactNode, useState} from 'react';
+import { groupByBirthDayCardGroupTitle } from '@utils/sortBirthday';
+import { keyExists, storeData } from '@utils/storage';
+import React, { createContext, type ReactNode, useCallback, useEffect, useState } from 'react';
+
+export type FriendInfo = {
+  avatar?: string;
+  name: string;
+  age: number;
+  gender: string;
+  isRemind: boolean;
+  birthDay: string;
+  birthDayDate: Date | string;
+  nextBirthDay: number;
+  group: string;
+};
+
+export enum BirthDayCardGroupTitle {
+  today = '今日寿星',
+  oneMonth = '近期过生日',
+  moreOneMonth = '一个月后过生日',
+}
 
 interface HomePageConTextType {
-  columns: number;
-  setColumns: Function;
+  isBatchManage: boolean;
+  selectedItems: { [key: string]: boolean };
+  group: string;
+  groupList: string[];
+  birthDayCardGroupsData: {
+    [key in BirthDayCardGroupTitle]: FriendInfo[];
+  };
+  setGroup: (group: string) => void;
+  setBirthDayCardGroupsData: (data: { [key in BirthDayCardGroupTitle]: FriendInfo[] }) => void;
+  updateGroupList: (groupList: string) => void;
+  deleteBirthDayCardGroupsData: (groupKey: string, toBeDeletedData: FriendInfo[]) => void;
+  editBirthDayCardGroupsData: (groupKey: string, toBeEditedData: FriendInfo, editedBirthDayCardData: FriendInfo) => void;
+  updateBirthDayCardGroupsData: (newData: FriendInfo) => void;
+  handleBatchManage: (batchManaged: boolean) => void;
+  handleCheckBoxChange: (item: any, checked: boolean) => void;
 }
 
 export const HomePageConText = createContext<HomePageConTextType>({
-  columns: 3,
-  setColumns: () => {},
+  isBatchManage: false,
+  selectedItems: {},
+  group: '我的好友',
+  groupList: [],
+  birthDayCardGroupsData: {
+    [BirthDayCardGroupTitle.today]: [],
+    [BirthDayCardGroupTitle.oneMonth]: [],
+    [BirthDayCardGroupTitle.moreOneMonth]: [],
+  },
+  setGroup: () => { },
+  setBirthDayCardGroupsData: () => { },
+  deleteBirthDayCardGroupsData: () => { },
+  editBirthDayCardGroupsData: () => { },
+  updateBirthDayCardGroupsData: () => { },
+  updateGroupList: () => { },
+  handleBatchManage: () => { },
+  handleCheckBoxChange: () => { },
 });
 
 // 创建Provider组件
-export const HomePageProvider = ({children}: {children: ReactNode}) => {
-  const [columns, setColumns] = useState(3); // 初始列数
+export const HomePageProvider = ({ children }: { children: ReactNode }) => {
+  const [isBatchManage, setIsBatchManage] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<{ [key: string]: boolean }>({});
+  const [groupList, setGroupList] = useState<string[]>(['我的好友']);
+  const [group, setGroup] = useState<string>('我的好友');
+  const [birthDayCardGroupsData, setBirthDayCardGroupsData] = useState<{ [key in BirthDayCardGroupTitle]: FriendInfo[] }>({
+    [BirthDayCardGroupTitle.today]: [],
+    [BirthDayCardGroupTitle.oneMonth]: [],
+    [BirthDayCardGroupTitle.moreOneMonth]: [],
+  });
+
+  // 初始化时从缓存中读取数据
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await keyExists('groupList');
+      if (data) {
+        setGroupList(JSON.parse(data));
+      }
+    };
+    fetchData();
+  }, []);
+
+  // 更新缓存中的数据
+  useEffect(() => {
+    storeData('groupList', groupList);
+  }, [groupList]);
+
+  // 更新缓存中的数据
+  useEffect(() => {
+    const friendInfoList = Object.values(birthDayCardGroupsData).flat();
+    if (!friendInfoList.every(friend => friend.group === group)
+      || !groupList.includes(group) || friendInfoList.length === 0) {
+      return;
+    }
+    storeData(`birthDayData-${group}`, friendInfoList);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [birthDayCardGroupsData]);
+
+  // 初始化时从缓存中读取数据
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await keyExists(`birthDayData-${group}`);
+      if (data) {
+        const birthDayCardGroupTempData: FriendInfo[] = JSON.parse(data);
+        setBirthDayCardGroupsData(groupByBirthDayCardGroupTitle(birthDayCardGroupTempData));
+      } else {
+        setBirthDayCardGroupsData({
+          [BirthDayCardGroupTitle.today]: [],
+          [BirthDayCardGroupTitle.oneMonth]: [],
+          [BirthDayCardGroupTitle.moreOneMonth]: [],
+        });
+      }
+    };
+    fetchData();
+  }, [group]);
+
+
+  const updateGroupList = useCallback((newGroup: string) => {
+    setGroupList(prevState => {
+      console.log('prevState', prevState);
+      if (prevState.includes(newGroup)) {
+        return prevState;
+      }
+      return [...prevState, newGroup];
+    });
+  }, []);
+
+  const deleteBirthDayCardGroupsData = useCallback(async (groupKey: string, toBeDeletedData: FriendInfo[]) => {
+    const birthDayData = await keyExists(`birthDayData-${groupKey}`);
+    if (birthDayData) {
+      const data = JSON.parse(birthDayData);
+      const newBirthDayCardData = data.filter((item: FriendInfo) =>
+        !toBeDeletedData.some(deletedItem => deletedItem.name === item.name && deletedItem.birthDayDate === item.birthDayDate)
+      );
+      storeData(`birthDayData-${groupKey}`, newBirthDayCardData);
+      setBirthDayCardGroupsData(groupByBirthDayCardGroupTitle(newBirthDayCardData));
+    }
+  }, []);
+
+  const editBirthDayCardGroupsData = useCallback(async (groupKey: string, toBeEditedData: FriendInfo, editedBirthDayCardData: FriendInfo) => {
+    const birthDayData = await keyExists(`birthDayData-${groupKey}`);
+    if (birthDayData) {
+      const data = JSON.parse(birthDayData);
+      const newBirthDayCardData = data.filter((item: FriendInfo) =>
+        item.name !== toBeEditedData.name && item.birthDayDate !== toBeEditedData.birthDayDate
+      );
+
+      if (groupKey !== editedBirthDayCardData.group) {
+        const newGroupData = await keyExists(`birthDayData-${editedBirthDayCardData.group}`);
+        if (newGroupData) {
+          const newGroupDataParsed = JSON.parse(newGroupData);
+          newGroupDataParsed.push(editedBirthDayCardData);
+          storeData(`birthDayData-${editedBirthDayCardData.group}`, newGroupDataParsed);
+        } else {
+          storeData(`birthDayData-${editedBirthDayCardData.group}`, [editedBirthDayCardData]);
+        }
+      } else {
+        newBirthDayCardData.push(editedBirthDayCardData);
+      }
+
+      storeData(`birthDayData-${groupKey}`, newBirthDayCardData);
+      setBirthDayCardGroupsData(groupByBirthDayCardGroupTitle(newBirthDayCardData));
+    }
+  }, []);
+
+  const updateBirthDayCardGroupsData = useCallback(async (newData: FriendInfo) => {
+    const groupKey = newData.group;
+    const data = await keyExists(`birthDayData-${groupKey}`);
+    if (data) {
+      const birthDayCardGroupTempData: FriendInfo[] = JSON.parse(data);
+      const isDuplicate = birthDayCardGroupTempData.some(friend => friend.name === newData.name && friend.birthDay === newData.birthDay);
+      if (!isDuplicate) {
+        storeData(`birthDayData-${groupKey}`, [...birthDayCardGroupTempData, newData]);
+      }
+    } else {
+      storeData(`birthDayData-${groupKey}`, [newData]);
+    }
+
+    if (groupKey !== group) {
+      return;
+    }
+
+    setBirthDayCardGroupsData(prevState => {
+      const updatedData = { ...prevState };
+      const isDuplicate = Object.values(updatedData).flat().some(friend => friend.name === newData.name && friend.birthDay === newData.birthDay);
+      if (!isDuplicate) {
+        if (newData.nextBirthDay === 0) {
+          updatedData[BirthDayCardGroupTitle.today].push(newData);
+        } else if (newData.nextBirthDay <= 30) {
+          updatedData[BirthDayCardGroupTitle.oneMonth].push(newData);
+        } else {
+          updatedData[BirthDayCardGroupTitle.moreOneMonth].push(newData);
+        }
+      }
+      return updatedData;
+    });
+  }, [group]);
+
+  const handleBatchManage = useCallback((batchManaged: boolean) => {
+    setIsBatchManage(batchManaged);
+    setSelectedItems({});
+  }, [setIsBatchManage, setSelectedItems]);
+
+  const handleCheckBoxChange = useCallback((item: FriendInfo, checked: boolean) => {
+    setSelectedItems(prevState => ({
+      ...prevState,
+      [item.name + item.birthDay]: checked,
+    }));
+  }, [setSelectedItems]);
 
   // 渲染Provider并传递state和setState函数
   return (
     <HomePageConText.Provider
-      value={{columns, setColumns}}>
+      value={{
+        isBatchManage,
+        selectedItems,
+        birthDayCardGroupsData,
+        group,
+        groupList,
+        setGroup,
+        setBirthDayCardGroupsData,
+        updateGroupList,
+        deleteBirthDayCardGroupsData,
+        editBirthDayCardGroupsData,
+        updateBirthDayCardGroupsData,
+        handleBatchManage,
+        handleCheckBoxChange,
+      }}>
       {children}
     </HomePageConText.Provider>
   );

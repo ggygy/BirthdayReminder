@@ -16,6 +16,15 @@ export const keyExists = async (key: string) => {
   }
 };
 
+export const storeData = async (key: string, value: any) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (e) {
+    console.error('Error storing data', e);
+  }
+};
+
 export const appendDataToKey = async (key: string, newData: Array<object>) => {
   try {
     // 尝试获取键的当前值
