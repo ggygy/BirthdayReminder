@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { Dialog, makeStyles, Text } from '@rneui/themed';
-import { FunctionComponent, memo } from 'react';
+import { FunctionComponent, memo, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AddCard from './AddCard';
@@ -63,9 +63,14 @@ const BirthDayAdditional: FunctionComponent<BirthDayAdditionalProps> = ({
 }) => {
 
     const styles = useStyles();
+    const [isAddCardVisible, setIsAddCardVisible] = useState(false);
 
     const toggleDialog = () => {
         setIsDialogVisible && setIsDialogVisible(false);
+    };
+
+    const handleDialogShow = () => {
+        setIsAddCardVisible(true);
     };
 
     return (
@@ -73,6 +78,8 @@ const BirthDayAdditional: FunctionComponent<BirthDayAdditionalProps> = ({
             isVisible={visible}
             overlayStyle={styles.container}
             onBackdropPress={toggleDialog}
+            onShow={handleDialogShow}
+            animationType="fade"
         >
             <View style={styles.header}>
                 <TouchableOpacity style={styles.headerButtonContainer} onPress={toggleDialog}>
@@ -81,7 +88,7 @@ const BirthDayAdditional: FunctionComponent<BirthDayAdditionalProps> = ({
                 <Text style={styles.headerButtonTitle}>{isEditMode ? '编辑好友生日' : '添加生日'}</Text>
             </View>
 
-            <AddCard setIsDialogVisible={setIsDialogVisible} isBatch={isBatch} isEdit={isEditMode} friendInfo={friendInfo}/>
+            { isAddCardVisible && <AddCard setIsDialogVisible={setIsDialogVisible} isBatch={isBatch} isEdit={isEditMode} friendInfo={friendInfo}/> }
         </Dialog>
     );
 };

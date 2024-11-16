@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        height: 40,
+        minHeight: 40,
         marginVertical: 10,
     },
     itemTitle: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     },
     tabContainer: {
         width: '60%',
-        height: 40,
+        minHeight: 40,
     },
     tabButtonStyle: {
         color: theme.colors.black,

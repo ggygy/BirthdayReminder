@@ -27,7 +27,8 @@ const useStyles = makeStyles(theme => ({
     },
     input: {
         width: '90%',
-        height: 30,
+        minHeight: 35,
+        maxHeight: 50,
         padding: 0,
         margin: 0,
     },
@@ -40,6 +41,7 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({ title, visible, 
             isVisible={visible}
             overlayStyle={styles.dialogContainer}
             onBackdropPress={toggleDialog}
+            animationType="fade"
         >
             <Dialog.Title title={title}/>
             { inputProps && <Input style={styles.input} label={inputProps?.label} placeholder={inputProps?.placeholder} value={inputProps?.inputValue} onChangeText={inputProps?.setInputValue}/> }

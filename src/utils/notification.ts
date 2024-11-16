@@ -4,13 +4,14 @@ import { keyExists } from './storage';
 import { groupByBirthDayCardGroupTitle } from './sortBirthday';
 import { Alert, Linking, PermissionsAndroid, Platform } from 'react-native';
 
-export const notification = (friendInfo: FriendInfo) => {
+export const notification = (friendInfo: FriendInfo, date = new Date(Date.now() + 60 * 1000)) => {
     PushNotification.localNotificationSchedule({
         channelId: 'default-channel-id',
         title: '你的好友即将过生日了！',
         message: `${friendInfo.name}即将在${friendInfo.nextBirthDay}天后过生日🥳🥳🥳！不要忘了哦！`,
-        date: new Date(Date.now() + 60 * 1000), // 1分钟后触发通知
+        date, // 默认1分钟后触发通知
         allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
+        // id: `${friendInfo.name}-${friendInfo.birthDay}`, // 使用好友姓名和生日作为通知ID
     });
 };
 
@@ -55,10 +56,33 @@ export const createNotification = async () => {
             if (birthDayData) {
                 let friendInfoList: FriendInfo[] = JSON.parse(birthDayData);
                 friendInfoList = friendInfoList.filter(friendInfo => friendInfo.isRemind);
-                friendInfoList = groupByBirthDayCardGroupTitle(friendInfoList)['近期过生日'];
-                friendInfoList.forEach(friendInfo => {
-                    if (friendInfo.nextBirthDay <= 3) {
+                friendInfoList = [
+                    ...groupByBirthDayCardGroupTitle(friendInfoList)['近期过生日'],
+                    ...groupByBirthDayCardGroupTitle(friendInfoList)['今日寿星'],
+                ];
+                friendInfoList.forEach(async friendInfo => {
+                    if (friendInfo.nextBirthDay === 0) {
+                        console.log('今天是', friendInfo.name, '的生日！');
                         notification(friendInfo);
+                    } else if (friendInfo.nextBirthDay <= 3) {
+                        const today = new Date();
+                        const notificationDate = new Date();
+                        notificationDate.setDate(today.getDate() + friendInfo.nextBirthDay - 1);
+                        notificationDate.setHours(10, 0, 0, 0); // 设置为早上 10 点
+                        notification(friendInfo, notificationDate);
+
+                        // 检查是否已经存在相同的通知
+                        // const scheduledNotifications = await new Promise<PushNotification.Notification[]>((resolve) => {
+                        //     PushNotification.getScheduledLocalNotifications((notifications: any) => {
+                        //         resolve(notifications);
+                        //     });
+                        // });
+                        // const notificationExists = scheduledNotifications.some(
+                        //     (n) => n.id === `${friendInfo.name}-${friendInfo.birthDay}`
+                        // );
+                        // if (!notificationExists) {
+                        //     notification(friendInfo, notificationDate);
+                        // }
                     }
                 });
             }
@@ -83,21 +107,21 @@ export const requestExactAlarmPermission = async () => {
     if (Platform.OS === 'android') {
         try {
             const granted = await PermissionsAndroid.request(
-                'android.permission.WRITE_CALENDAR',
+                'android.permission.POST_NOTIFICATIONS',
                 {
-                    title: '需要精确闹钟权限',
-                    message: '应用需要精确闹钟权限来设置精确的通知时间。',
+                    title: '需要发送通知权限',
+                    message: '应用需要发送通知权限来向你推送好友生日的消息。',
                     buttonNeutral: '稍后询问',
                     buttonNegative: '拒绝',
                     buttonPositive: '允许',
                 },
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                Alert.alert('精确闹钟权限已授予');
+                Alert.alert('发送通知权限已授予');
                 return true;
             } else {
                 Alert.alert(
-                    '应用需要精确闹钟权限来设置精确的通知时间。请前往系统设置授予权限。',
+                    '应用需要发送通知权限来向你推送好友生日的消息。请前往系统设置授予权限。',
                 );
                 setTimeout(() => {
                     Linking.openSettings();

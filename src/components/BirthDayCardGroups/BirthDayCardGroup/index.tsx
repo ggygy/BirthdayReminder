@@ -16,7 +16,8 @@ interface BirthDayCardGroupProps {
 
 const useStyles = makeStyles(theme => ({
     textContainerStyle: {
-        width: 420,
+        width: 'auto',
+        paddingHorizontal: 10,
         marginTop: 3,
         marginBottom: 5,
     },

@@ -21,4 +21,3 @@ export const uploadAvatar = async (onSuccessCallback?: (destPath?: string) => vo
         Alert.alert('Error', 'Failed to save avatar locally.');
       }
 };
-

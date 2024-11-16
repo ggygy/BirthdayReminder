@@ -36,7 +36,8 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: 10,
     },
     avatarButton: {
-        width: 86,
+        width: 120,
+        maxWidth: 180,
         height: 32,
         padding: 0,
         margin: 0,
@@ -98,7 +99,7 @@ const useStyles = makeStyles((theme) => ({
     tabContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        width: 265,
+        maxWidth: '70%',
         height: 40,
         padding: 0,
         margin: 0,
