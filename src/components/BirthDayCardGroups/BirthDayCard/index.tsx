@@ -127,7 +127,7 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
         }
         setTimeout(() => {
             setIsConfirmDialogVisible(false);
-        }, 1000);
+        }, 100);
     };
 
     const handleDelete = async () => {

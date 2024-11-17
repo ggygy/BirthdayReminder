@@ -1,7 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { Dialog, makeStyles, Text } from '@rneui/themed';
 import { FunctionComponent, memo, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AddCard from './AddCard';
 import { type FriendInfo } from '@context/homePageContext';
@@ -27,18 +27,11 @@ const useStyles = makeStyles((theme) => ({
     },
     header: {
         maxHeight: 40,
-        marginBottom: 10,
+        marginBottom: 5,
         width: '100%',
         alignItems: 'center',
         justifyContent: 'flex-start',
         flexDirection: 'row',
-    },
-    headerButtonContainer: {
-        height: 40,
-        padding: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: theme.colors.white,
     },
     headerButton: {
         paddingHorizontal: 0,
@@ -81,13 +74,10 @@ const BirthDayAdditional: FunctionComponent<BirthDayAdditionalProps> = ({
             onShow={handleDialogShow}
             animationType="fade"
         >
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.headerButtonContainer} onPress={toggleDialog}>
-                    <Ionicons name={'chevron-back'} size={32}  style={styles.headerButtonIcon} />
-                </TouchableOpacity>
+            <TouchableOpacity style={styles.header} onPress={toggleDialog} activeOpacity={0.4}>
+                <Ionicons name={'chevron-back'} size={32}  style={styles.headerButtonIcon} />
                 <Text style={styles.headerButtonTitle}>{isEditMode ? '编辑好友生日' : '添加生日'}</Text>
-            </View>
-
+            </TouchableOpacity>
             { isAddCardVisible && <AddCard setIsDialogVisible={setIsDialogVisible} isBatch={isBatch} isEdit={isEditMode} friendInfo={friendInfo}/> }
         </Dialog>
     );

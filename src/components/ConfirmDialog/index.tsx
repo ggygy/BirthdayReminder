@@ -14,7 +14,10 @@ interface ConfirmDialogProps {
 
 const useStyles = makeStyles(theme => ({
     dialogContainer: {
+        width: '84%',
         borderRadius: 8,
+        paddingVertical: 20,
+        paddingHorizontal: 20,
     },
     title: {
         fontSize: 18,

@@ -13,7 +13,7 @@ interface GroupOptionProps {
 const useStyles = makeStyles((theme) => ({
     itemContainer: {
         display: 'flex',
-        width: '90%',
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         color: theme.colors.black,
     },
     tabContainer: {
-        maxWidth: '78%',
+        maxWidth: '72%',
         minHeight: 40,
     },
     tabButtonStyle: {

@@ -14,6 +14,8 @@ const useStyles = makeStyles((theme) => ({
         flex: 1,
         maxHeight: '100%',
         minWidth: '100%',
+        position: 'absolute',
+        top: 50,
         paddingHorizontal: 6,
         backgroundColor: theme.colors.background,
         justifyContent: 'flex-start',
