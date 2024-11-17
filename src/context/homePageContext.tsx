@@ -26,6 +26,8 @@ interface HomePageConTextType {
   selectedItems: { [key: string]: boolean };
   group: string;
   groupList: string[];
+  isCustomModalVisible: boolean;
+  handleModal: (visible: boolean, callback?: () => void) => void;
   birthDayCardGroupsData: {
     [key in BirthDayCardGroupTitle]: FriendInfo[];
   };
@@ -45,6 +47,8 @@ export const HomePageConText = createContext<HomePageConTextType>({
   selectedItems: {},
   group: '我的好友',
   groupList: [],
+  isCustomModalVisible: false,
+  handleModal: () => { },
   birthDayCardGroupsData: {
     [BirthDayCardGroupTitle.today]: [],
     [BirthDayCardGroupTitle.oneMonth]: [],
@@ -68,6 +72,7 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
   const [groupList, setGroupList] = useState<string[]>(['我的好友']);
   const [group, setGroup] = useState<string>('我的好友');
   const isFirstRender = useIsFirstRender();
+  const [isCustomModalVisible, setIsCustomModalVisible] = useState(false);
   const [birthDayCardGroupsData, setBirthDayCardGroupsData] = useState<{ [key in BirthDayCardGroupTitle]: FriendInfo[] }>({
     [BirthDayCardGroupTitle.today]: [],
     [BirthDayCardGroupTitle.oneMonth]: [],
@@ -148,6 +153,10 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
     fetchData();
   }, [group, isFirstRender]);
 
+  const handleModal = useCallback((visible: boolean, callback?: (() => void)) => {
+    callback && callback();
+    setIsCustomModalVisible(visible);
+  } ,[]);
 
   const updateGroupList = useCallback((newGroup: string) => {
     setGroupList(prevState => {
@@ -254,8 +263,10 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
         selectedItems,
         birthDayCardGroupsData,
         group,
+        isCustomModalVisible,
         groupList,
         setGroup,
+        handleModal,
         setBirthDayCardGroupsData,
         updateGroupList,
         deleteGroupList,

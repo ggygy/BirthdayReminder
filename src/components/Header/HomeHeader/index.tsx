@@ -1,14 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import { Button, makeStyles } from '@rneui/themed';
+import { makeStyles } from '@rneui/themed';
 import React, { FunctionComponent, memo, useContext, useState } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
 import PressableWrapperText from '../../pressableText';
 import { FriendInfo, HomePageConText } from '@context/homePageContext';
 import ConfirmDialog from '@components/ConfirmDialog';
-import CustomListItem from '@components/CustomListItem';
 import { keyExists, storeData } from '@utils/storage';
+import Tools from '@components/ToolsBox/Tools';
 
 interface HomeHeaderProps {
 
@@ -41,17 +39,9 @@ const useStyles = makeStyles((theme) => ({
     marginHorizontal: 8,
     color: theme.colors.black,
   },
-  tools: {
-    maxWidth: '30%',
-    flex: 1,
-    position: 'relative',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 5,
-    alignItems: 'center',
-  },
   batchManageTools: {
     minWidth: '25%',
+    minHeight: '100%',
     flex: 1,
     zIndex: 10,
     flexDirection: 'row',
@@ -67,23 +57,8 @@ const useStyles = makeStyles((theme) => ({
   toolsLabel: {
     fontSize: 22,
     marginHorizontal: 10,
-    color: theme.colors.grey4,
+    color: theme.mode === 'dark' ? 'white' : theme.colors.grey3,
     fontWeight: 'bold',
-  },
-  layer: {
-    position: 'absolute',
-    top: 40,
-    backgroundColor: theme.colors.background,
-    zIndex: 10,
-    minWidth: 180,
-    minHeight: 180,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    shadowColor: theme.colors.black, // 阴影颜色
-    shadowOffset: { width: 6, height: 3 }, // 阴影偏移
-    elevation: 10, // 安卓阴影
-    shadowOpacity: 1, // 阴影透明度
-    shadowRadius: 3.84, // 阴影半径
   },
   input: {
     width: '100%',
@@ -92,88 +67,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Tools = memo(({ setActive }: {
-  setActive: (index: number) => void;
-}) => {
-  const styles = useStyles();
-  const [openLayer, setOpenLayer] = useState(false);
-  const [options, setOptions] = useState('');
-  const [groupInput, setGroupInput] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState(0);
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const { groupList, updateGroupList, deleteGroupList, setGroup } = useContext(HomePageConText);
-
-  const handleDeleteGroup = () => {
-    setOptions('删除');
-    setIsDialogVisible(true);
-  };
-
-  const handleAddGroup = () => {
-    setOptions('添加');
-    setIsDialogVisible(true);
-  };
-
-  const toggleConfirmDialog = (isConfirm?: boolean) => {
-    if (!isConfirm) {
-      setIsDialogVisible(false);
-      return;
-    }
-    if (options === '添加') {
-      // 添加分组
-      updateGroupList(groupInput);
-      setGroup(groupInput);
-      setActive(groupList.length);
-    } else if (options === '删除') {
-      // 删除分组
-      deleteGroupList(groupList[selectedGroup]);
-      setGroup(groupList[0]);
-      setActive(0);
-    }
-    setIsDialogVisible(false);
-    setGroupInput('');
-    setTimeout(() => {
-      setOpenLayer(false);
-    }, 500);
-  };
-
-  return (
-    <View style={styles.tools}>
-      <Button
-        icon={<Ionicons name={'search'}
-          size={24} style={styles.icon} />}
-        radius={'sm'} type="clear" />
-      <Button
-        icon={<Entypo name={'dots-three-vertical'}
-          size={20} style={styles.icon} />} radius={'sm'} type="clear" onPress={() => setOpenLayer(!openLayer)} />
-      {
-        openLayer && <View style={styles.layer}>
-          <CustomListItem iconName={'inbox'} iconType={'material-community'} title={'添加分组'} onPress={() => handleAddGroup()} />
-          <CustomListItem iconName={'trash-can-outline'} iconType={'material-community'} title={'删除分组'} onPress={() => handleDeleteGroup()} />
-        </View>
-      }
-      <ConfirmDialog title={`是否${options}分组`}
-        inputProps={options === '添加' ? {
-          placeholder: '请输入分组名称',
-          inputValue: groupInput,
-          setInputValue: setGroupInput,
-        } : undefined}
-        groupOptionProps={options === '删除' ? {
-            title: '选择分组',
-            selectedGroup,
-            setSelectedGroup,
-          } : undefined
-        }
-       visible={isDialogVisible} toggleDialog={toggleConfirmDialog} />
-    </View>
-  );
-});
-
 const BatchManageTools = memo(() => {
   const styles = useStyles();
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [options, setOptions] = useState('');
   const [selectedGroup, setSelectedGroup] = useState(0);
-  const { group, groupList,selectedItems, handleBatchManage, deleteBirthDayCardGroupsData } = useContext(HomePageConText);
+  const { group, groupList, selectedItems, handleBatchManage, deleteBirthDayCardGroupsData } = useContext(HomePageConText);
 
   const handleCancel = () => {
     handleBatchManage(false);
@@ -279,7 +178,7 @@ const HomeHeader: FunctionComponent<HomeHeaderProps> = () => {
         }
       </ScrollView>
       {
-        isBatchManage ? <BatchManageTools /> : <Tools setActive={setActive}/>
+        isBatchManage ? <BatchManageTools /> : <Tools setActive={setActive} />
       }
     </View>
   );

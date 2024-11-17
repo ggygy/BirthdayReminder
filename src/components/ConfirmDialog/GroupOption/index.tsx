@@ -21,13 +21,12 @@ const useStyles = makeStyles((theme) => ({
         marginVertical: 10,
     },
     itemTitle: {
-        fontSize: 20,
+        fontSize: 16,
         lineHeight: 40,
-        marginRight: 20,
         color: theme.colors.black,
     },
     tabContainer: {
-        width: '60%',
+        maxWidth: '78%',
         minHeight: 40,
     },
     tabButtonStyle: {
@@ -44,7 +43,7 @@ const GroupOption: FunctionComponent<GroupOptionProps> = ({ title, selectedGroup
 
     return (
         <View style={styles.itemContainer}>
-            <Text style={styles.itemTitle} >{title}</Text>
+            <Text style={styles.itemTitle} >{title}：</Text>
             <Tab
                 value={selectedGroup}
                 scrollable={true}

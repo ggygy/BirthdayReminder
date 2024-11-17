@@ -1,7 +1,8 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { Button, Dialog, Input, makeStyles } from '@rneui/themed';
+import { Dialog, Input, makeStyles } from '@rneui/themed';
 import { FunctionComponent, memo } from 'react';
 import GroupOption from './GroupOption';
+import PressableText from '@components/pressableText';
 
 interface ConfirmDialogProps {
     title: string;
@@ -14,23 +15,35 @@ interface ConfirmDialogProps {
 const useStyles = makeStyles(theme => ({
     dialogContainer: {
         borderRadius: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
     },
     title: {
-        fontSize: 24,
-        color: theme.colors.primary,
+        fontSize: 18,
     },
     buttonContainer: {
-        width: '40%',
-        marginHorizontal: '4%',
+        width: 50,
+        padding: 3,
+        marginTop: 10,
+        marginLeft: 30,
+    },
+    container: {
+        maxHeight: 40,
+        margin: 0,
+        padding: 0,
+    },
+    inputContainer: {
+        maxHeight: 40,
+        margin: 0,
+        padding: 0,
     },
     input: {
-        width: '90%',
-        minHeight: 35,
-        maxHeight: 50,
+        fontSize: 16,
         padding: 0,
         margin: 0,
+        height: 20,
+    },
+    text: {
+        fontSize: 18,
+        color: theme.colors.primary,
     },
 }));
 
@@ -44,19 +57,11 @@ const ConfirmDialog: FunctionComponent<ConfirmDialogProps> = ({ title, visible, 
             animationType="fade"
         >
             <Dialog.Title title={title}/>
-            { inputProps && <Input style={styles.input} label={inputProps?.label} placeholder={inputProps?.placeholder} value={inputProps?.inputValue} onChangeText={inputProps?.setInputValue}/> }
+            { inputProps && <Input inputStyle={styles.input} inputContainerStyle={styles.inputContainer} containerStyle={styles.container}  label={inputProps?.label} placeholder={inputProps?.placeholder} value={inputProps?.inputValue} onChangeText={inputProps?.setInputValue}/> }
             { groupOptionProps && <GroupOption title={groupOptionProps.title} selectedGroup={groupOptionProps.selectedGroup} setSelectedGroup={groupOptionProps.setSelectedGroup} /> }
             <Dialog.Actions>
-                <Button
-                    title="取消"
-                    type="clear"
-                    titleStyle={styles.title}
-                    containerStyle={styles.buttonContainer}
-                    onPress={() => {
-                        toggleDialog(false);
-                    }}
-                />
-                <Button type="clear" title="确认" titleStyle={styles.title} containerStyle={styles.buttonContainer} onPress={() => toggleDialog(true)} />
+                <PressableText text="确认" style={styles.text} containerStyle={styles.buttonContainer} onPress={() => toggleDialog(true)} />
+                <PressableText text="取消" style={styles.text} containerStyle={styles.buttonContainer} onPress={() => toggleDialog(false)} />
             </Dialog.Actions>
         </Dialog>
         );

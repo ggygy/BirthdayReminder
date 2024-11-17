@@ -7,7 +7,7 @@ import { keyExists } from '@utils/storage';
 
 interface ReminderScreenProps {}
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   container: {
     flex: 1,
     flexDirection: 'column',
@@ -17,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ReminderScreen: FunctionComponent<ReminderScreenProps> = () => {
   const styles = useStyles();
+  const[, forceUpdate] = useState({});
   const [tileData, setTileData] = useState({
     imageSrc: undefined,
     title: undefined,
@@ -28,7 +29,7 @@ const ReminderScreen: FunctionComponent<ReminderScreenProps> = () => {
       const tileDataStore = await keyExists('tileData');
       if (tileDataStore) {
         const tileDataTemp = JSON.parse(tileDataStore);
-        if (tileDataTemp.imageSrc && tileDataTemp.title && tileDataTemp.caption) {
+        if (tileDataTemp.imageSrc || tileDataTemp.title || tileDataTemp.caption) {
           setTileData(tileDataTemp);
         }
       }
@@ -38,8 +39,12 @@ const ReminderScreen: FunctionComponent<ReminderScreenProps> = () => {
 
   return (
     <View style={styles.container}>
-      <ReminderHeader />
-      <BlessTile imageSrc={tileData.imageSrc} title={tileData.title} caption={tileData.caption}/>
+      <ReminderHeader forceUpdate={forceUpdate}/>
+      <BlessTile
+        imageSrc={tileData.imageSrc === '' ? undefined : tileData.imageSrc}
+        title={tileData.title === '' ? undefined : tileData.title}
+        caption={tileData.caption === '' ? undefined : tileData.caption}
+      />
     </View>
   );
 };

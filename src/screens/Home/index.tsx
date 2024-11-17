@@ -1,8 +1,8 @@
 import React, {FunctionComponent} from 'react';
-import {View} from 'react-native';
+import {StatusBar, View} from 'react-native';
 import {HomeHeaderMemo} from '@components/Header';
 import {HomePageProvider} from '@context/homePageContext';
-import {makeStyles} from '@rneui/themed';
+import {makeStyles, useTheme} from '@rneui/themed';
 import BottomSheet from '@components/BottomSheet';
 import BirthDayCardGroups from '@components/BirthDayCardGroups';
 
@@ -24,9 +24,16 @@ const useStyles = makeStyles(theme => ({
 
 const HomeScreen: FunctionComponent<HomeScreenProps> = () => {
   const styles = useStyles();
+  const { theme } = useTheme();
   return (
     <HomePageProvider>
+        {
+          theme.mode === 'light'
+          ? <StatusBar backgroundColor="white" barStyle="dark-content" />
+          : <StatusBar backgroundColor="black" barStyle="light-content" />
+        }
       <View style={styles.container}>
+        {/* <CustomModal /> */}
         <HomeHeaderMemo />
         <BirthDayCardGroups />
         <BottomSheet buttonStyle={styles.bottomSheet}/>

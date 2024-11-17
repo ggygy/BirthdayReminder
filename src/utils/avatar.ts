@@ -21,3 +21,21 @@ export const uploadAvatar = async (onSuccessCallback?: (destPath?: string) => vo
         Alert.alert('Error', 'Failed to save avatar locally.');
       }
 };
+
+export const uploadImage = async (onSuccessCallback?: (destPath?: string) => void) => {
+  try {
+      const image = await ImagePicker.openPicker({
+        cropping: true,
+        mediaType: 'photo',
+      });
+
+      const fileName = image.path.split('/').pop();
+      const destPath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+
+      await RNFS.copyFile(image.path, destPath);
+      onSuccessCallback && onSuccessCallback(`file://${destPath}`);
+      Alert.alert('Success', 'Image saved locally!');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save Image locally.');
+    }
+};

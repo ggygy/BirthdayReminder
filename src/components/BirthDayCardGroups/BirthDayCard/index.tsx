@@ -4,7 +4,7 @@
 import { Avatar, Button, ListItem, makeStyles } from '@rneui/themed';
 import LinearGradient from 'react-native-linear-gradient';
 import { FunctionComponent, memo, useContext, useState } from 'react';
-import { Dimensions, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, Text, TouchableNativeFeedback, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { type FriendInfo, HomePageConText } from '@context/homePageContext';
 import BirthDayAdditional from '@components/birthDayAdditional';
@@ -71,21 +71,24 @@ const useStyles = makeStyles((theme, screenWidth: number) => ({
         flexDirection: 'column',
         alignItems: 'flex-start',
     },
+    iconContainerStyle: {
+        marginLeft: 3,
+        height: 38,
+    },
     avatarContainerStyle: {
         backgroundColor: '#bdbdbd',
         justifyContent: 'center',
     },
     textStylePrimary: {
         color: theme.colors.white,
-        fontSize: 20,
+        fontSize: 18,
     },
     textStyleSecondary: {
         color: theme.colors.grey5,
-        fontSize: 15,
+        fontSize: 14,
     },
     icon: {
-        marginLeft: 6,
-        marginBottom: 20,
+        // marginTop: 1,
     },
     checkBoxStyle: {
         backgroundColor: 'transparent',
@@ -186,16 +189,16 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
                         />
                     )}
                 >
-                    <TouchableWithoutFeedback
-                        onPressIn={handlePressIn}
+                    <TouchableNativeFeedback
+                        onPressIn={() => handlePressIn()}
                         onPressOut={handlePressOut}
                         onPress={() => handleSwipeableClick()}
                         onLongPress={() => handleBatchManage(!isBatchManage)}
+                        background={TouchableNativeFeedback.SelectableBackground()}
                     >
                         <ListItem.Content style={[
                             styles.SwipeableContentStyle,
-                            nextBirthDay <= 31 ? { backgroundColor: '#fe5165' } : undefined,
-                            isPressed ? { opacity: 0.85 } : undefined]} >
+                            nextBirthDay <= 31 ? { backgroundColor: '#fe5165' } : undefined]}>
                             <View style={styles.leftInfoContainerStyle}>
                                 {avatar ? <Avatar
                                     size={56}
@@ -206,14 +209,18 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
                                     title={name.slice(0, 3)}
                                     containerStyle={[styles.avatarContainerStyle, nextBirthDay <= 31 ? { backgroundColor: '#fd870b' } : undefined]}
                                     rounded
-                                    titleStyle={{ fontSize: 16 }}
+                                    titleStyle={{ fontSize: 15 }}
                                 />}
                                 <View style={styles.infoContainerStyle}>
-                                    <ListItem.Title style={[styles.textStylePrimary, { fontSize: 18 }]}>{name}({age}岁)</ListItem.Title>
+                                    <ListItem.Title style={[styles.textStylePrimary, { fontSize: 18 }]}>
+                                        {name}
+                                        <Text style={{ fontSize: 16 }}>({age}岁)</Text>
+                                    </ListItem.Title>
                                     <ListItem.Title style={styles.textStyleSecondary}>{birthDay}</ListItem.Title>
                                 </View>
-                                <Ionicons name={'notifications-circle'} size={24}
-                                    style={[styles.icon, { color: isRemind ? '#ffe067' : '#e2a600' }]} />
+                                <View style={styles.iconContainerStyle}>
+                                    <Ionicons name={'notifications-circle'} size={24} style={[styles.icon, { color: isRemind ? '#ffe067' : '#e2a600' }]} />
+                                </View>
                             </View>
                             {isBatchManage ? <ListItem.CheckBox
                                 iconType="Ionicons"
@@ -232,7 +239,7 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
                                     </ListItem.Title>
                                 </ListItem.Title>}
                         </ListItem.Content>
-                    </TouchableWithoutFeedback>
+                    </TouchableNativeFeedback>
                 </ListItem.Swipeable>
             </ListItem>
         </>

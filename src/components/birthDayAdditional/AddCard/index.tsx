@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.colors.background,
     },
     avatar: {
-        backgroundColor: '#6733b9',
+        backgroundColor: theme.colors.divider,
         marginBottom: 10,
     },
     avatarButton: {
