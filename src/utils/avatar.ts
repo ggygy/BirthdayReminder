@@ -26,6 +26,7 @@ export const uploadImage = async (onSuccessCallback?: (destPath?: string) => voi
   try {
       const image = await ImagePicker.openPicker({
         cropping: true,
+        freeStyleCropEnabled: true, // 允许用户自由裁剪
         mediaType: 'photo',
       });
 

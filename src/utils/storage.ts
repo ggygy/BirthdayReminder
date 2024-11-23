@@ -11,7 +11,7 @@ export const keyExists = async (key: string) => {
     return false;
   } catch (error) {
     // 处理可能发生的错误
-    console.error('Error checking if key exists:', error);
+    // console.error('Error checking if key exists:', error);
     return false;
   }
 };
@@ -21,7 +21,7 @@ export const storeData = async (key: string, value: any) => {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem(key, jsonValue);
   } catch (e) {
-    console.error('Error storing data', e);
+    // console.error('Error storing data', e);
   }
 };
 
@@ -43,18 +43,18 @@ export const appendDataToKey = async (key: string, newData: Array<object>) => {
 
     // 保存更新后的值
     await AsyncStorage.setItem(key, updatedValue);
-    console.log('Data appended and updated successfully!');
+    // console.log('Data appended and updated successfully!');
   } catch (error) {
     // 处理可能发生的错误
-    console.error('Error appending data to key:', error);
+    // console.error('Error appending data to key:', error);
   }
 };
 
 export const removeKey = async (key: string) => {
   try {
     await AsyncStorage.removeItem(key);
-    console.log(`Key ${key} removed successfully`);
+    // console.log(`Key ${key} removed successfully`);
   } catch (error) {
-    console.error(`Failed to remove key ${key}:`, error);
+    // console.error(`Failed to remove key ${key}:`, error);
   }
 };

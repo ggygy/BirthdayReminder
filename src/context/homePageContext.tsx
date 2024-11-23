@@ -103,6 +103,7 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     storeData(`birthDayData-${group}`, friendInfoList);
+    console.log(`birthDayData-${group}`, birthDayCardGroupsData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [birthDayCardGroupsData]);
 
@@ -115,32 +116,7 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
         setBirthDayCardGroupsData(groupByBirthDayCardGroupTitle(birthDayCardGroupTempData));
       } else {
         if (isFirstRender && group === '我的好友') {
-          setBirthDayCardGroupsData(groupByBirthDayCardGroupTitle(
-            [
-              {
-                avatar: undefined,
-                name: '马馨怡',
-                age: 18,
-                gender: '女',
-                isRemind: true,
-                birthDay: '11月12日',
-                birthDayDate: new Date('2003-11-12'),
-                nextBirthDay: 0,
-                group: '我的好友',
-              },
-              {
-                avatar: undefined,
-                name: '周王军',
-                age: 18,
-                gender: '男',
-                isRemind: true,
-                birthDay: '5月13日',
-                birthDayDate: new Date('1999-5-13'),
-                nextBirthDay: 0,
-                group: '我的好友',
-              },
-          ],
-          ));
+          setBirthDayCardGroupsData(groupByBirthDayCardGroupTitle([]));
           return;
         }
         setBirthDayCardGroupsData({

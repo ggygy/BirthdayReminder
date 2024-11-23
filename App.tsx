@@ -10,7 +10,7 @@ import ReminderScreen from '@screens/Reminder';
 import TabBar from '@components/TabBar';
 import {theme} from '@utils/theme';
 import {ThemeProvider} from '@rneui/themed';
-import { enableNotification } from '@utils/notification';
+import { enableNotification, requestExactAlarmPermission } from '@utils/notification';
 
 const Tab = createBottomTabNavigator();
 
@@ -31,8 +31,9 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     if (isMountedRef.current) {
-      enableNotification();
+      requestExactAlarmPermission(false);
     }
+    enableNotification();
   }, []);
 
   return (

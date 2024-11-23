@@ -165,7 +165,7 @@ const HomeHeader: FunctionComponent<HomeHeaderProps> = () => {
         contentContainerStyle={{ alignItems: 'center' }}
         style={styles.group}>
         {
-          groupList.map((item, index) => {
+          groupList?.map((item, index) => {
             return <PressableWrapperText key={index}
               style={active === index ? styles.labelActive : styles.label}
               text={item}

@@ -20,7 +20,7 @@ export const createNotification = async () => {
     PushNotification.configure({
         // eslint-disable-next-line @typescript-eslint/no-shadow
         onNotification: function (notification: any) {
-            console.log('NOTIFICATION:', notification);
+            // console.log('NOTIFICATION:', notification);
         },
         requestPermissions: Platform.OS === 'ios',
     });
@@ -29,7 +29,7 @@ export const createNotification = async () => {
     if (Platform.OS === 'ios') {
         const permission = await PushNotification.requestPermissions();
         if (!permission.alert) {
-            console.log('用户拒绝了推送通知权限');
+            // console.log('用户拒绝了推送通知权限');
             return;
         }
     }
@@ -44,7 +44,7 @@ export const createNotification = async () => {
             importance: 4, // 可选
             vibrate: true, // 可选
         },
-        (created: boolean) => console.log(`createChannel returned '${created}'`)
+        (created: boolean) => /*console.log(`createChannel returned '${created}'`)*/ {},
     );
 
     // 获取所有分组
@@ -62,7 +62,7 @@ export const createNotification = async () => {
                 ];
                 friendInfoList.forEach(async friendInfo => {
                     if (friendInfo.nextBirthDay === 0) {
-                        console.log('今天是', friendInfo.name, '的生日！');
+                        // console.log('今天是', friendInfo.name, '的生日！');
                         notification(friendInfo);
                     } else if (friendInfo.nextBirthDay <= 3) {
                         const today = new Date();
@@ -103,7 +103,7 @@ export const enableNotification = async () => {
     }
 };
 
-export const requestExactAlarmPermission = async () => {
+export const requestExactAlarmPermission = async (isAlert: boolean = true) => {
     if (Platform.OS === 'android') {
         try {
             const granted = await PermissionsAndroid.request(
@@ -117,7 +117,7 @@ export const requestExactAlarmPermission = async () => {
                 },
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                Alert.alert('发送通知权限已授予');
+                isAlert && Alert.alert('发送通知权限已授予');
                 return true;
             } else {
                 Alert.alert(
@@ -129,7 +129,7 @@ export const requestExactAlarmPermission = async () => {
                 return false;
             }
         } catch (err) {
-            console.warn(err);
+            // console.warn(err);
             return false;
         }
     }

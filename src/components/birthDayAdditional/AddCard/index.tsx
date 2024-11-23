@@ -257,7 +257,7 @@ const GroupType = memo(({ title, selectedGroup, setSelectedGroup }: {
                 buttonStyle={styles.tabButtonStyle}
                 indicatorStyle={styles.tabIndicatorStyle} dense>
                 {
-                    groupList.map((item, index) => (
+                    groupList?.map((item, index) => (
                         <Tab.Item key={index}>{item}</Tab.Item>
                     ))
                 }

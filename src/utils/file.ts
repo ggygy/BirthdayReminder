@@ -1,7 +1,7 @@
 import RNFS from 'react-native-fs';
-import { keyExists, storeData } from './storage';
+import { keyExists, removeKey, storeData } from './storage';
 import DocumentPicker from 'react-native-document-picker';
-import { Alert } from 'react-native';
+import { Alert, BackHandler } from 'react-native';
 
 export const exportData = async () => {
     try {
@@ -20,8 +20,7 @@ export const exportData = async () => {
                 allData[group] = JSON.parse(birthDayData);
             }
         }
-
-        const directoryPath = `${RNFS.DocumentDirectoryPath}/exportedData`;
+        const directoryPath = `${RNFS.DownloadDirectoryPath}`;
         const filePath = `${directoryPath}/birthDayData.json`;
 
         // 确保目标文件夹存在
@@ -46,25 +45,40 @@ export const importData = async () => {
         const fileUri = res[0].uri;
         const fileContent = await RNFS.readFile(fileUri, 'utf8');
         const importedData = JSON.parse(fileContent);
-        console.log(importedData);
 
-        if (importedData.groupList) {
-            // await storeData('groupList', JSON.stringify(importedData.groupList));
+        // 先清楚原有数据
+        const groupList = await keyExists('groupList');
+        if (groupList) {
+            const currentGroupList = JSON.parse(groupList);
+            for (const group of currentGroupList) {
+                await removeKey(`birthDayData-${group}`);
+            }
         }
+        await removeKey('groupList');
 
-        for (const [group, data] of Object.entries(importedData)) {
-            if (group !== 'groupList') {
-                console.log(group, data);
-                // await storeData(`birthDayData-${group}`, JSON.stringify(data));
+        if (importedData?.groupList) {
+            await storeData('groupList', importedData.groupList);
+            for (const [group, data] of Object.entries(importedData)) {
+                if (group !== 'groupList') {
+                    await storeData(`birthDayData-${group}`, data);
+                }
             }
         }
 
-        Alert.alert('Success', 'Data imported successfully!');
+        Alert.alert('Success', 'Data imported successfully!', [
+            {
+                text: 'OK',
+                onPress: () => {
+                    // 退出应用程序
+                    BackHandler.exitApp();
+                },
+            },
+        ]);
     } catch (err) {
         if (DocumentPicker.isCancel(err)) {
             Alert.alert('Cancelled', 'File selection was cancelled.');
         } else {
-            Alert.alert('Error', 'Failed to import data.');
+            Alert.alert(`Error-${err}`, 'Failed to import data.');
         }
     }
 };
