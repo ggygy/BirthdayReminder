@@ -7,7 +7,7 @@ export const exportData = async () => {
     try {
         const groupListData = await keyExists('groupList');
         if (!groupListData) {
-            Alert.alert('Error', 'No group list data found.');
+            Alert.alert('导出失败', '未找到好友分组列表数据。');
             return;
         }
 
@@ -30,9 +30,9 @@ export const exportData = async () => {
         }
 
         await RNFS.writeFile(filePath, JSON.stringify(allData), 'utf8');
-        Alert.alert('Success', `Data exported to ${filePath}`);
+        Alert.alert('导出成功', `数据被导出至 ${filePath}`);
     } catch (error) {
-        Alert.alert('Error', 'Failed to export data.');
+        Alert.alert(`导出失败', '导出数据失败: ${error}`);
     }
 };
 
@@ -46,7 +46,7 @@ export const importData = async () => {
         const fileContent = await RNFS.readFile(fileUri, 'utf8');
         const importedData = JSON.parse(fileContent);
 
-        // 先清楚原有数据
+        // 先清除原有数据
         const groupList = await keyExists('groupList');
         if (groupList) {
             const currentGroupList = JSON.parse(groupList);
@@ -65,7 +65,7 @@ export const importData = async () => {
             }
         }
 
-        Alert.alert('Success', 'Data imported successfully!', [
+        Alert.alert('导入成功', '数据导入成功！', [
             {
                 text: 'OK',
                 onPress: () => {
@@ -76,9 +76,9 @@ export const importData = async () => {
         ]);
     } catch (err) {
         if (DocumentPicker.isCancel(err)) {
-            Alert.alert('Cancelled', 'File selection was cancelled.');
+            Alert.alert('导入被取消', '文件选择被取消。');
         } else {
-            Alert.alert(`Error-${err}`, 'Failed to import data.');
+            Alert.alert(`导入失败：${err}`, '导入数据失败。');
         }
     }
 };

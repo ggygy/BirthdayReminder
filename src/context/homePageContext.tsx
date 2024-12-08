@@ -38,6 +38,7 @@ interface HomePageConTextType {
   deleteBirthDayCardGroupsData: (groupKey: string, toBeDeletedData: FriendInfo[]) => void;
   editBirthDayCardGroupsData: (groupKey: string, toBeEditedData: FriendInfo, editedBirthDayCardData: FriendInfo) => void;
   updateBirthDayCardGroupsData: (newData: FriendInfo) => void;
+  searchFriends: (query: string) => Promise<FriendInfo[]>;
   handleBatchManage: (batchManaged: boolean) => void;
   handleCheckBoxChange: (item: any, checked: boolean) => void;
 }
@@ -61,6 +62,7 @@ export const HomePageConText = createContext<HomePageConTextType>({
   updateBirthDayCardGroupsData: () => { },
   updateGroupList: () => { },
   deleteGroupList: () => { },
+  searchFriends: () => Promise.resolve([]),
   handleBatchManage: () => { },
   handleCheckBoxChange: () => { },
 });
@@ -103,7 +105,6 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     storeData(`birthDayData-${group}`, friendInfoList);
-    console.log(`birthDayData-${group}`, birthDayCardGroupsData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [birthDayCardGroupsData]);
 
@@ -219,6 +220,18 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [group]);
 
+  const searchFriends = useCallback(async (query: string): Promise<FriendInfo[]> => {
+    const allFriends: FriendInfo[] = [];
+    for (const currentGroup of groupList) {
+      const data = await keyExists(`birthDayData-${currentGroup}`);
+      if (data) {
+        const friends: FriendInfo[] = JSON.parse(data);
+        allFriends.push(...friends);
+      }
+    }
+    return allFriends.filter(friend => friend.name.includes(query) || friend.group.includes(query));
+  }, [groupList]);
+
   const handleBatchManage = useCallback((batchManaged: boolean) => {
     setIsBatchManage(batchManaged);
     setSelectedItems({});
@@ -249,6 +262,7 @@ export const HomePageProvider = ({ children }: { children: ReactNode }) => {
         deleteBirthDayCardGroupsData,
         editBirthDayCardGroupsData,
         updateBirthDayCardGroupsData,
+        searchFriends,
         handleBatchManage,
         handleCheckBoxChange,
       }}>

@@ -4,7 +4,7 @@
 import { Avatar, Button, ListItem, makeStyles } from '@rneui/themed';
 import LinearGradient from 'react-native-linear-gradient';
 import { FunctionComponent, memo, useContext, useState } from 'react';
-import { Dimensions, Text, TouchableNativeFeedback, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, Text, TouchableNativeFeedback, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { type FriendInfo, HomePageConText } from '@context/homePageContext';
 import BirthDayAdditional from '@components/birthDayAdditional';
@@ -13,6 +13,7 @@ import ConfirmDialog from '@components/ConfirmDialog';
 export interface BirthDayCardProps {
     friendInfo: FriendInfo
     checked: boolean
+    needBatchManage?: boolean
 }
 
 const useStyles = makeStyles((theme, screenWidth: number) => ({
@@ -95,7 +96,7 @@ const useStyles = makeStyles((theme, screenWidth: number) => ({
     },
 }));
 
-const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checked }) => {
+const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checked, needBatchManage = true }) => {
     const screenWidth = Dimensions.get('window').width;
     const { isBatchManage, handleBatchManage, handleCheckBoxChange, deleteBirthDayCardGroupsData } = useContext(HomePageConText);
     const [isDialogVisible, setIsDialogVisible] = useState(false);
@@ -193,7 +194,7 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
                         onPressIn={() => handlePressIn()}
                         onPressOut={handlePressOut}
                         onPress={() => handleSwipeableClick()}
-                        onLongPress={() => handleBatchManage(!isBatchManage)}
+                        onLongPress={() => needBatchManage && handleBatchManage(!isBatchManage)}
                         background={TouchableNativeFeedback.SelectableBackground()}
                     >
                         <ListItem.Content style={[

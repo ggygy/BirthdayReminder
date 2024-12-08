@@ -7,6 +7,7 @@ import { Alert, Modal, TouchableOpacity, TouchableWithoutFeedback, View } from '
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { HomePageConText } from '@context/homePageContext';
+import SearchPage from '@components/SearchPage';
 
 interface ToolsProps {
 	setActive: (index: number) => void;
@@ -67,6 +68,7 @@ const Tools: FunctionComponent<ToolsProps> = ({ setActive }) => {
 	const [options, setOptions] = useState('');
 	const [groupInput, setGroupInput] = useState('');
 	const [modalVisible, setModalVisible] = useState(false);
+	const [searchPageVisible, setSearchPageVisible] = useState(false);
 	const [selectedGroup, setSelectedGroup] = useState(0);
 	const [isDialogVisible, setIsDialogVisible] = useState(false);
 	const { groupList, updateGroupList, deleteGroupList, setGroup } = useContext(HomePageConText);
@@ -115,12 +117,12 @@ const Tools: FunctionComponent<ToolsProps> = ({ setActive }) => {
 	return (
 		<View style={styles.tools}>
 			<TouchableOpacity style={styles.iconContainer}>
-				<Ionicons name={'search'} size={24} style={styles.icon} />
+				<Ionicons name={'search'} size={24} style={styles.icon} onPress={() => setSearchPageVisible(!searchPageVisible)}/>
 			</TouchableOpacity>
 			<TouchableOpacity style={styles.iconContainer} onPress={() => handleLayer()}>
 				<Entypo name={'dots-three-vertical'} size={21} style={styles.icon} />
 			</TouchableOpacity>
-
+			<SearchPage searchPageVisible={searchPageVisible} handleSearchPageVisible={setSearchPageVisible} />
 			<Modal
 				visible={modalVisible}
 				animationType="none"

@@ -16,9 +16,9 @@ export const uploadAvatar = async (onSuccessCallback?: (destPath?: string) => vo
 
         await RNFS.copyFile(image.path, destPath);
         onSuccessCallback && onSuccessCallback(`file://${destPath}`);
-        Alert.alert('Success', 'Avatar saved locally!');
+        Alert.alert('成功', '头像保存成功!');
       } catch (error) {
-        Alert.alert('Error', 'Failed to save avatar locally.');
+        Alert.alert('失败', '无法在本地保存头像。');
       }
 };
 
@@ -35,8 +35,8 @@ export const uploadImage = async (onSuccessCallback?: (destPath?: string) => voi
 
       await RNFS.copyFile(image.path, destPath);
       onSuccessCallback && onSuccessCallback(`file://${destPath}`);
-      Alert.alert('Success', 'Image saved locally!');
+      Alert.alert('成功', '图片保存成功!');
     } catch (error) {
-      Alert.alert('Error', 'Failed to save Image locally.');
+      Alert.alert('失败', '无法在本地保存图片。');
     }
 };
