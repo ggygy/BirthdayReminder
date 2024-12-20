@@ -8,8 +8,7 @@ export const formatDate = (date: Date): string => {
 
 // 格式化日期为 ISO 字符串格式，并设置当前时区
 const formatToLocalISOString = (date: Date) => {
-    const tzOffset = -date.getTimezoneOffset() * 60000; // 时区偏移量，以毫秒为单位
-    const localISOTime = new Date(date.getTime() + tzOffset).toISOString().slice(0, -1); // 去掉最后的 'Z'
+    const localISOTime = new Date(date.getTime()).toISOString();
     return localISOTime;
 };
 

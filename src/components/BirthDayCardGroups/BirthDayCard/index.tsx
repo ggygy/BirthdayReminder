@@ -68,6 +68,7 @@ const useStyles = makeStyles((theme, screenWidth: number) => ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        height: 45,
     },
     infoContainerStyle: {
         marginLeft: 10,
@@ -75,12 +76,12 @@ const useStyles = makeStyles((theme, screenWidth: number) => ({
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        height: 40,
+        height: 45,
     },
     iconContainerStyle: {
         marginLeft: 3,
         justifyContent: 'flex-start',
-        height: 40,
+        height: 45,
     },
     avatarContainerStyle: {
         backgroundColor: '#bdbdbd',
@@ -95,7 +96,7 @@ const useStyles = makeStyles((theme, screenWidth: number) => ({
         fontSize: 14,
     },
     icon: {
-        marginTop: 1,
+        // marginTop: 1,
     },
     checkBoxStyle: {
         backgroundColor: 'transparent',
