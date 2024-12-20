@@ -32,7 +32,7 @@ export const exportData = async () => {
         await RNFS.writeFile(filePath, JSON.stringify(allData), 'utf8');
         Alert.alert('导出成功', `数据被导出至 ${filePath}`);
     } catch (error) {
-        Alert.alert(`导出失败', '导出数据失败: ${error}`);
+        Alert.alert('导出失败', '导出数据失败: ${error}');
     }
 };
 

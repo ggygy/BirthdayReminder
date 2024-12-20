@@ -60,22 +60,31 @@ const SearchPage: FunctionComponent<SearchPageProps> = ({ searchPageVisible, han
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleSearch = useCallback(
         debounce(async (query: string) => {
+            if (!query) {
+                setSearchResult([]);
+                return;
+            }
             const result = await searchFriends(query);
             setSearchResult(result);
         }, 300),
     []);
+
+    const handleModalClose = (visible: boolean) => {
+        setSearchResult([]);
+        handleSearchPageVisible(visible);
+    };
 
     return (
         <Modal
             visible={searchPageVisible}
             animationType="fade"
             transparent={false}
-            onRequestClose={() => handleSearchPageVisible(false)}
+            onRequestClose={() => handleModalClose(false)}
         >
             <View style={styles.modalContainer}>
                 <View style={styles.header}>
                     <SearchBar placeholder="搜索..." onSearch={handleSearch} setSearchResult={setSearchResult}/>
-                    <TouchableOpacity onPress={() => handleSearchPageVisible(false)} activeOpacity={0.4}>
+                    <TouchableOpacity onPress={() => handleModalClose(false)} activeOpacity={0.4}>
                         <Text style={styles.headerButtonTitle}>取消</Text>
                     </TouchableOpacity>
                 </View>

@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react/react-in-jsx-scope */
 /* eslint-disable react/no-unstable-nested-components */
 import { Avatar, Button, ListItem, makeStyles } from '@rneui/themed';
 import LinearGradient from 'react-native-linear-gradient';
@@ -9,6 +8,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { type FriendInfo, HomePageConText } from '@context/homePageContext';
 import BirthDayAdditional from '@components/birthDayAdditional';
 import ConfirmDialog from '@components/ConfirmDialog';
+import CalendarEvent from '@components/CalendarEvent';
+import React from 'react';
+import { getStartAndEndDate, getZodiacSign } from '@utils/date';
 
 export interface BirthDayCardProps {
     friendInfo: FriendInfo
@@ -65,16 +67,20 @@ const useStyles = makeStyles((theme, screenWidth: number) => ({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     infoContainerStyle: {
         marginLeft: 10,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
+        justifyContent: 'center',
+        height: 40,
     },
     iconContainerStyle: {
         marginLeft: 3,
-        height: 38,
+        justifyContent: 'flex-start',
+        height: 40,
     },
     avatarContainerStyle: {
         backgroundColor: '#bdbdbd',
@@ -89,7 +95,7 @@ const useStyles = makeStyles((theme, screenWidth: number) => ({
         fontSize: 14,
     },
     icon: {
-        // marginTop: 1,
+        marginTop: 1,
     },
     checkBoxStyle: {
         backgroundColor: 'transparent',
@@ -98,13 +104,16 @@ const useStyles = makeStyles((theme, screenWidth: number) => ({
 
 const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checked, needBatchManage = true }) => {
     const screenWidth = Dimensions.get('window').width;
+    const styles = useStyles(screenWidth);
     const { isBatchManage, handleBatchManage, handleCheckBoxChange, deleteBirthDayCardGroupsData } = useContext(HomePageConText);
     const [isDialogVisible, setIsDialogVisible] = useState(false);
     const [isConfirmDialogVisible, setIsConfirmDialogVisible] = useState(false);
     const [isPressed, setIsPressed] = useState(false);
     const [isSwiping, setIsSwiping] = useState(false);
-    const { avatar = '', name = '', age, isRemind, birthDay, nextBirthDay } = friendInfo;
-    const styles = useStyles(screenWidth);
+    const [calendarEventVisible, setCalendarEventVisible] = useState(false);
+    const { avatar = '', name = '', age, isRemind, birthDay, birthDayDate, nextBirthDay } = friendInfo;
+    const { startDate, endDate } = getStartAndEndDate(birthDayDate);
+    const zodiacSign = getZodiacSign(birthDayDate);
     const linearGradientStart = nextBirthDay <= 31 ? '#F44336' : '#979797';
     const linearGradientEnd = nextBirthDay <= 31 ? '#FF9800' : '#bdbdbd';
 
@@ -116,10 +125,6 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
         setTimeout(() => {
             setIsDialogVisible(true);
         }, 0);
-    };
-
-    const handelCardClick = () => {
-        setIsDialogVisible(true);
     };
 
     const toggleConfirmDialog = (isConfirm?: boolean) => {
@@ -146,6 +151,10 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
         setIsPressed(false);
     };
 
+    const handleCalendarEventVisible = (visible: boolean) => {
+        setCalendarEventVisible(visible);
+    };
+
     return (
         <>
             {isDialogVisible && <BirthDayAdditional visible={isDialogVisible} isEditMode={true} friendInfo={friendInfo} setIsDialogVisible={setIsDialogVisible} />}
@@ -163,7 +172,7 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
                     onSwipeEnd={() => setIsSwiping(false)}
                     leftContent={(reset) => (
                         <Button
-                            title="设置"
+                            title="设置日历"
                             ViewComponent={LinearGradient}
                             linearGradientProps={{
                                 colors: [linearGradientStart, linearGradientEnd],
@@ -171,7 +180,7 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
                                 end: { x: 1, y: 0.5 },
                             }}
                             onPress={() => reset()}
-                            onPressOut={() => handelCardClick()}
+                            onPressOut={() => handleCalendarEventVisible(true)}
                             buttonStyle={styles.leftButtonStyle}
                         />
                     )}
@@ -217,7 +226,7 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
                                         {name}
                                         <Text style={{ fontSize: 16 }}>({age}岁)</Text>
                                     </ListItem.Title>
-                                    <ListItem.Title style={styles.textStyleSecondary}>{birthDay}</ListItem.Title>
+                                    <ListItem.Title style={styles.textStyleSecondary}>{`${birthDay} ${zodiacSign}`}</ListItem.Title>
                                 </View>
                                 <View style={styles.iconContainerStyle}>
                                     <Ionicons name={'notifications-circle'} size={24} style={[styles.icon, { color: isRemind ? '#ffe067' : '#e2a600' }]} />
@@ -243,6 +252,12 @@ const BirthDayCard: FunctionComponent<BirthDayCardProps> = ({ friendInfo, checke
                     </TouchableNativeFeedback>
                 </ListItem.Swipeable>
             </ListItem>
+            {calendarEventVisible && <CalendarEvent
+                startDate={startDate}
+                endDate={endDate}
+                calendarEventVisible={calendarEventVisible}
+                handleCalendarEventVisible={handleCalendarEventVisible}
+            />}
         </>
     );
 };
